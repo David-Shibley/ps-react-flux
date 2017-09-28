@@ -3,7 +3,8 @@
 var React = require('react')
 var Router = require('react-router')
 var AuthorForm = require('./authorForm')
-var AuthorApi = require('../../api/authorApi')
+var AuthorActions = require('../../actions/authorActions')
+var AuthorStore = require('../../stores/authorStore')
 var toastr = require('toastr')
 
 var ManageAuthor = React.createClass({
@@ -31,7 +32,8 @@ var ManageAuthor = React.createClass({
         var authorId = this.props.params.id
 
         if (authorId) {
-            this.setState({ author: AuthorApi.getAuthorById(authorId)})
+            console.log('calling get by id', AuthorStore.getAuthorById(authorId))
+            this.setState({ author: AuthorStore.getAuthorById(authorId)})
         }
     },
 
@@ -68,7 +70,12 @@ var ManageAuthor = React.createClass({
             return
         }
 
-        AuthorApi.saveAuthor(this.state.author)
+        if (this.state.author.id) {
+            console.log('state', this.state.author)
+            AuthorActions.updateAuthor(this.state.author)
+        } else {
+            AuthorActions.createAuthor(this.state.author)
+        }
         this.setState({ dirty: false })
         toastr.success('Author Saved.')
         this.transitionTo('authors')
